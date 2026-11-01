@@ -1,0 +1,7 @@
+# Digirig Mobile: stable names so USB enumeration order can't shift them.
+# Serial port (CP2102N) carries PTT on RTS. Note the IC-7300 is also 10c4:ea60, so the unique
+# serial number is what distinguishes them. Replace YOUR_SERIAL as in 99-ic7300.rules.
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="YOUR_SERIAL", SYMLINK+="digirig", GROUP="dialout", MODE="0660"
+
+# Sound card (C-Media): rename the ALSA id so it is plughw:digirig,0 regardless of card index.
+SUBSYSTEM=="sound", ATTRS{idVendor}=="0d8c", ATTRS{idProduct}=="0012", ATTR{id}="digirig"

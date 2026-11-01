@@ -1,0 +1,5 @@
+# Lets pat_launch.sh control the services without a password. Replace pi with your user.
+# Check it, then install it:
+#   sudo visudo -cf system/sudoers-pat-launch
+#   sudo install -m 440 system/sudoers-pat-launch /etc/sudoers.d/pat-launch
+pi ALL=(root) NOPASSWD: /usr/bin/systemctl stop pat xara-ic7300 ardopcf, /usr/bin/systemctl start rigctld, /usr/bin/systemctl start ardopcf, /usr/bin/systemctl start xara-ic7300, /usr/bin/systemctl start pat

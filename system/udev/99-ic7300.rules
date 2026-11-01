@@ -1,0 +1,6 @@
+# Icom IC-7300 USB serial: always create /dev/ic7300. Replace YOUR_SERIAL with the radio's
+# USB serial, from: udevadm info -a -n /dev/ttyUSB0 | grep '{serial}'
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="YOUR_SERIAL", SYMLINK+="ic7300", GROUP="dialout", MODE="0660"
+# IC-7300 USB audio (ALSA card id "CODEC"). Gives the card a stable systemd device unit.
+# ardopcf and xara-ic7300 BindsTo this device, so powering the radio off stops them.
+SUBSYSTEM=="sound", KERNEL=="card*", ATTR{id}=="CODEC", TAG+="systemd", ENV{SYSTEMD_ALIAS}+="/sys/subsystem/sound/devices/ic7300codec"

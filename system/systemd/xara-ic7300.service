@@ -1,0 +1,32 @@
+[Unit]
+Description=XARA VARA HF modem for Pat on the IC-7300 (TX-capable; keys only when Pat connects)
+Documentation=https://github.com/x0rro/xara
+# Started only by the Pat menu launcher (pat_launch.sh), never at boot or on radio power-on.
+# Shares the 7300's sound card with ardopcf, so the two can never run together:
+# starting either one stops the other.
+Conflicts=ardopcf.service
+After=rigctld.service
+Wants=rigctld.service
+BindsTo=sys-subsystem-sound-devices-ic7300codec.device
+After=sys-subsystem-sound-devices-ic7300codec.device
+
+[Service]
+Type=simple
+User=pi
+# Your callsign. The unit refuses to start with the placeholder.
+Environment=MYCALL=N0CALL
+ExecStartPre=/bin/sh -c 'test "$$MYCALL" != N0CALL'
+# Same calibrated CODEC level ardopcf.service pins (alsa-restore misses the late USB card).
+ExecStartPre=/usr/bin/amixer -c CODEC sset PCM 93
+# Proven 2026-10-31: 30 complete VARA sessions with this command line.
+# Pat sends BW500/2300/2750 per call.
+# --ptt-max-s 30 is the stuck-key guard; XARA never transmits unless Pat asks it to connect.
+ExecStart=/usr/local/bin/xara --call ${MYCALL} --hf 2300 \
+  --audio alsa --capture plughw:CARD=CODEC,DEV=0 --playback plughw:CARD=CODEC,DEV=0 \
+  --radio --ptt rigctld:127.0.0.1:4532 --ptt-max-s 30
+# Belt and braces: make sure the rig is unkeyed whenever XARA exits for any reason.
+ExecStopPost=-/usr/bin/rigctl -m 2 -r localhost:4532 T 0
+# XARA exits 130 on SIGTERM; that is a clean stop, not a failure.
+SuccessExitStatus=130 143
+Restart=on-failure
+RestartSec=5

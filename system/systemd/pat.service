@@ -1,0 +1,23 @@
+[Unit]
+Description=Pat Winlink web UI
+Documentation=https://getpat.io/
+# Not Wants/After ardopcf.service: ardopcf only runs while the launcher has it up, and
+# ordering after it would stall Pat ~90s at boot waiting for a radio that's off.
+# Pat reaches the ARDOP TNC on demand at connect time.
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+# Deliberately NOT "--listen ardop". A listening Pat holds ardopcf's command
+# and data ports (8515/8516) open for the life of the service, so any manual
+# "pat connect" becomes a second host fighting the first for the same modem --
+# which shows up as sessions stalling in IDLE or dying with no output. Winlink
+# RMS gateways never call us; we always call them, so the listener buys nothing
+# here. Initiate connections from the web UI, or stop this service first.
+ExecStart=/usr/bin/pat http
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

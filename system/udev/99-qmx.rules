@@ -1,0 +1,6 @@
+# QRP Labs QMX Transceiver - always create /dev/qmx symlink.
+# The QMX's STM32 USB-CDC descriptor doesn't expose a per-unit serial number
+# (unlike the IC-7300's CP210x), so this matches by idVendor:idProduct alone.
+# Fine as long as there's only one QMX on this system; if a second one is ever
+# added, this rule needs a way to disambiguate them (e.g. by USB port path).
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="a34c", SYMLINK+="qmx", GROUP="dialout", MODE="0660"

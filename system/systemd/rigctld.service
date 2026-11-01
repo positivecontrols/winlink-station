@@ -1,0 +1,18 @@
+[Unit]
+Description=Hamlib rigctld for IC-7300 (CAT + PTT)
+Documentation=https://hamlib.github.io/
+After=network.target
+# /dev/ic7300 is a plain udev SYMLINK+= (99-ic7300.rules, keyed on the radio's
+# USB serial), which does NOT create a dev-ic7300.device unit -- binding to one
+# would leave this service permanently queued at boot. Restart=always instead
+# lets it retry until the radio is plugged in and enumerated.
+
+[Service]
+Type=simple
+User=pi
+ExecStart=/usr/bin/rigctld -m 3073 -r /dev/ic7300 -s 115200 -t 4532 -C poll_interval=0
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

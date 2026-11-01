@@ -1,0 +1,34 @@
+[Unit]
+Description=ardopcf ARDOP soundcard modem for Winlink HF
+Documentation=https://github.com/pflarue/ardop
+After=network.target sound.target rigctld.service
+Wants=rigctld.service
+# Started by launcher/pat_launch.sh, and stopped when the IC-7300's USB audio (card "CODEC")
+# goes away -- see 99-ic7300.rules. Leave it disabled: with the radio off at boot,
+# Restart=always below crash-looped every 5s forever.
+BindsTo=sys-subsystem-sound-devices-ic7300codec.device
+After=sys-subsystem-sound-devices-ic7300codec.device
+
+[Service]
+Type=simple
+User=pi
+# alsa-restore.service runs early in boot, before the USB CODEC card (same
+# IC-7300 USB interface as /dev/ic7300) has enumerated, so it silently skips
+# restoring CODEC's saved PCM level (93 here; find yours with calibrate_drive.py) and the card
+# comes up at its power-on default instead. Pin it here explicitly right
+# before ardopcf starts, since by then CODEC is guaranteed to exist -- this
+# unit only reaches ExecStart once Restart=always has gotten it that far.
+ExecStartPre=/usr/bin/amixer -c CODEC sset PCM 93
+# TRAILER 120 is load-bearing, not a tuning preference. At the ardopcf default
+# of 20 ms the transmitter unkeys before the tail of a short frame has left the
+# sound card, so the gateway fails CRC on our ConAck while still decoding the
+# much longer ConReq. That asymmetry stalls every ARQ session immediately after
+# the gateway answers. Do not lower this without re-testing an on-air connect.
+ExecStart=/usr/local/bin/ardopcf 8515 plughw:CODEC,0 plughw:CODEC,0 -G 8514 -l /tmp -H "TRAILER 120"
+# The USB CODEC card doesn't always enumerate before this unit starts at boot.
+# ardopcf's InitSound() failure path exits 0 on that, not nonzero, so
+# Restart=on-failure never fires and the unit just dies silently -- confirmed
+# on the 2026-08-31 reboot test. rigctld hit the same USB race on its side and
+# was already fixed with Restart=always; do the same here.
+Restart=always
+RestartSec=5

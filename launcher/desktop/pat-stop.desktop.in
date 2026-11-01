@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Pat: stop all radios
+Comment=Stop every Pat radio stack (modems, Pat web UI, Direwolf); unkey the rigs
+Exec=@LAUNCHER@ stop
+Icon=process-stop
+Terminal=false
+Categories=HamRadio;
+StartupNotify=false

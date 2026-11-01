@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Pat (QMX) ARDOP
+Comment=Winlink over HF: QMX + ARDOP. Stops any other Pat stack, then opens the Pat web UI
+Exec=@LAUNCHER@ qmx-ardop
+Icon=mail-send-receive
+Terminal=false
+Categories=HamRadio;
+StartupNotify=false

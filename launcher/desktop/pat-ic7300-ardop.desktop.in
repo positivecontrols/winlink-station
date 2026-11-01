@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Pat (IC-7300) ARDOP
+Comment=Winlink over HF: IC-7300 + ARDOP. Stops any other Pat stack, then opens the Pat web UI
+Exec=@LAUNCHER@ ic7300-ardop
+Icon=mail-send-receive
+Terminal=false
+Categories=HamRadio;
+StartupNotify=false
